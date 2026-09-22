@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Abdallah — Video Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0D0E12;
+    --bg-raised: #16171C;
+    --line: #26272E;
+    --text: #F3F1EA;
+    --muted: #8A8C94;
+    --rec: #FF3B30;
+    --tag: #34D8C6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap{ max-width: 980px; margin: 0 auto; padding: 64px 24px 100px; }
+
+  /* HERO */
+  .hero{ margin-bottom: 72px; }
+  .rec-row{
+    display:flex; align-items:center; gap:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 13px; letter-spacing: 0.08em; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 22px;
+  }
+  .rec-dot{
+    width:9px; height:9px; border-radius:50%;
+    background: var(--rec);
+    box-shadow: 0 0 0 0 rgba(255,59,48,0.6);
+    animation: pulse 1.8s infinite;
+  }
+  @keyframes pulse{
+    0%{ box-shadow: 0 0 0 0 rgba(255,59,48,0.55); }
+    70%{ box-shadow: 0 0 0 8px rgba(255,59,48,0); }
+    100%{ box-shadow: 0 0 0 0 rgba(255,59,48,0); }
+  }
+  h1{
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(42px, 8vw, 74px);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+  }
+  .role{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: clamp(18px, 2.4vw, 24px);
+    color: var(--tag);
+    margin-top: 14px;
+    font-weight: 500;
+  }
+  .role span{ color: var(--muted); font-weight: 400; }
+  .blurb{
+    max-width: 520px; margin-top: 22px;
+    color: var(--muted); font-size: 15px; line-height: 1.6;
+  }
+
+  /* GRID */
+  .grid-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px; letter-spacing: 0.1em; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 20px;
+    display:flex; justify-content: space-between; align-items:center;
+    border-bottom: 1px solid var(--line); padding-bottom: 14px;
+  }
+  .grid{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+  @media (max-width: 640px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+  .link-grid.three-col{ grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 780px){
+    .link-grid.three-col{ grid-template-columns: 1fr; }
+  }
+
+  .reel-card{
+    display:flex; flex-direction:column; gap: 0;
+    background: var(--bg-raised);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration:none;
+    color: var(--text);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+  }
+  .reel-card:hover{ border-color: var(--tag); transform: translateY(-2px); }
+  .reel-thumb{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 9/16;
+    overflow: hidden;
+    background: #000;
+  }
+  .reel-thumb img{
+    width:100%; height:100%; object-fit: cover;
+    display:block;
+    transition: transform 0.4s ease;
+  }
+  .reel-card:hover .reel-thumb img{ transform: scale(1.04); }
+  .thumb-overlay{
+    position:absolute; inset:0;
+    background: linear-gradient(180deg, rgba(13,14,18,0) 55%, rgba(13,14,18,0.85) 100%);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .play-icon{
+    width: 46px; height:46px; border-radius:50%;
+    background: rgba(13,14,18,0.55);
+    border: 1px solid rgba(243,241,234,0.35);
+    display:flex; align-items:center; justify-content:center;
+    color: var(--text);
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    transform: scale(0.9);
+  }
+  .reel-card:hover .play-icon{ opacity: 1; transform: scale(1); }
+  .reel-info{ padding: 16px 18px; }
+  .reel-title{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 500; font-size: 15px; margin-bottom: 4px;
+  }
+  .reel-cta{
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11.5px; color: var(--muted);
+  }
+  .reel-card:hover .reel-cta{ color: var(--tag); }
+
+  /* CLIENTS */
+  .client-card{
+    margin-top: 24px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 26px 26px 30px;
+    background: var(--bg-raised);
+  }
+  .client-header{
+    display:flex; justify-content:space-between; align-items:center;
+    gap: 16px; text-decoration:none; color: var(--text);
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 18px; margin-bottom: 18px;
+  }
+  .client-name-block{ display:flex; align-items:center; gap: 14px; }
+  .client-logo{
+    width: 44px; height: 44px; object-fit: contain;
+    border-radius: 8px;
+    background: #fff;
+    padding: 4px;
+  }
+  .client-name{
+    font-family:'Space Grotesk', sans-serif; font-weight:500; font-size: 17px;
+  }
+  .client-sub{
+    font-family:'JetBrains Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 4px;
+  }
+  .client-visit{
+    font-family:'JetBrains Mono', monospace; font-size: 12.5px; color: var(--tag);
+    border: 1px solid var(--line); padding: 7px 14px; border-radius: 20px;
+    white-space: nowrap;
+    transition: border-color 0.2s ease;
+  }
+  .client-header:hover .client-visit{ border-color: var(--tag); }
+  .client-note{
+    font-family:'JetBrains Mono', monospace; font-size: 11.5px; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 16px;
+  }
+  .client-card .embed-grid{ grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 780px){
+    .client-card .embed-grid{ grid-template-columns: 1fr; }
+  }
+
+  /* CONTACT */
+  .contact{
+    margin-top: 88px;
+    border-top: 1px solid var(--line);
+    padding-top: 40px;
+    display:flex; flex-wrap:wrap; justify-content: space-between; align-items:flex-end; gap: 24px;
+  }
+  .contact h2{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: clamp(24px, 4vw, 34px);
+    max-width: 380px; line-height: 1.15;
+  }
+  .contact-links{ display:flex; flex-direction:column; gap:10px; align-items:flex-end; }
+  .contact-links a{
+    color: var(--text); text-decoration:none;
+    font-family:'JetBrains Mono', monospace; font-size: 13.5px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 2px;
+    transition: color 0.2s ease, border-color 0.2s ease;
+  }
+  .contact-links a:hover{ color: var(--tag); border-color: var(--tag); }
+  .contact-note{ color: var(--muted); font-size: 12px; margin-top: 6px; }
+
+  /* QUALITY BANNER */
+  .quality-banner{
+    display:flex; align-items:center; gap: 14px;
+    margin-bottom: 28px;
+    padding: 14px 18px;
+    border: 1px solid rgba(52,216,198,0.35);
+    border-radius: 8px;
+    background: linear-gradient(90deg, rgba(52,216,198,0.10), rgba(52,216,198,0.02));
+  }
+  .quality-badge{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 700; font-size: 12.5px; letter-spacing: 0.06em;
+    color: #0D0E12;
+    background: var(--tag);
+    padding: 6px 12px; border-radius: 20px;
+    white-space: nowrap;
+    animation: glow 2.4s ease-in-out infinite;
+  }
+  @keyframes glow{
+    0%, 100%{ box-shadow: 0 0 0 0 rgba(52,216,198,0.35); }
+    50%{ box-shadow: 0 0 0 6px rgba(52,216,198,0); }
+  }
+  .quality-text{
+    font-size: 13.5px; color: var(--text);
+    line-height: 1.4;
+  }
+
+  /* CORNER TAGS on thumbnails */
+  .corner-tag{
+    position:absolute; top: 10px; left: 10px; z-index: 2;
+    font-family:'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 500;
+    padding: 5px 10px; border-radius: 20px;
+    background: rgba(13,14,18,0.65);
+    border: 1px solid rgba(52,216,198,0.5);
+    color: var(--tag);
+    backdrop-filter: blur(3px);
+  }
+  .corner-tag.fire{
+    border-color: rgba(255,140,0,0.55);
+    color: #FFB347;
+    animation: firepulse 1.8s ease-in-out infinite;
+  }
+  @keyframes firepulse{
+    0%, 100%{ opacity: 1; }
+    50%{ opacity: 0.72; }
+  }
+
+  /* REACH BANNER in client card */
+  .reach-banner{
+    display:flex; align-items:center; gap: 10px;
+    margin-bottom: 18px;
+    font-size: 13px; color: var(--text);
+    line-height: 1.4;
+  }
+  .reach-banner strong{ color: #FFB347; }
+  .reach-dot{
+    width:8px; height:8px; border-radius:50%; flex-shrink:0;
+    background: #FF8C00;
+    animation: firedot 1.6s ease-in-out infinite;
+  }
+  @keyframes firedot{
+    0%, 100%{ box-shadow: 0 0 0 0 rgba(255,140,0,0.5); }
+    50%{ box-shadow: 0 0 0 6px rgba(255,140,0,0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="rec-row"><span class="rec-dot"></span> Reel showcase</div>
+    <h1>ABDALLAH</h1>
+    <div class="role">Video Editor <span>— Amman, Jordan</span></div>
+    <p class="blurb">Reels edited in Premiere Pro — clean cuts, rhythmic pacing, and color-graded footage built to hold attention in the first three seconds.</p>
+  </div>
+
+  <div class="quality-banner">
+    <div class="quality-badge">★ BEST WORK</div>
+    <div class="quality-text">This is the quality you get — my strongest edits, client-ready</div>
+  </div>
+
+  <div class="grid-label">
+    <span>Selected work</span>
+    <span>02 reels</span>
+  </div>
+
+  <div class="grid link-grid">
+    <a class="reel-card img-card" href="https://www.instagram.com/reel/DakCyFpo6C6/" target="_blank">
+      <div class="reel-thumb">
+        <img src="covers/1.jpg" alt="Reel 01 cover">
+        <div class="corner-tag">★ Best edit</div>
+        <div class="thumb-overlay">
+          <div class="play-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+      </div>
+      <div class="reel-info">
+        <div class="reel-title">Reel 01</div>
+        <div class="reel-cta">Watch on Instagram ↗</div>
+      </div>
+    </a>
+    <a class="reel-card img-card" href="https://www.instagram.com/reel/DYpsePoo4Gz/" target="_blank">
+      <div class="reel-thumb">
+        <img src="covers/2.jpg" alt="Reel 02 cover">
+        <div class="corner-tag">★ Best edit</div>
+        <div class="thumb-overlay">
+          <div class="play-icon"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+        </div>
+      </div>
+      <div class="reel-info">
+        <div class="reel-title">Reel 02</div>
+        <div class="reel-cta">Watch on Instagram ↗</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="grid-label" style="margin-top:72px;">
+    <span>Clients</span>
+    <span>01 active</span>
+  </div>
+
+  <div class="client-card">
+    <a href="https://www.instagram.com/al.mafsal/" target="_blank" class="client-header">
+      <div class="client-name-block">
+        <img src="logo/al-mafsal.png" alt="AL-Mafsal logo" class="client-logo">
+        <div>
+          <div class="client-name">AL-Mafsal — مركز المفصل للعلاج الطبيعي</div>
+          <div class="client-sub">Physical therapy clinic · @al.mafsal</div>
+        </div>
+      </div>
+      <span class="client-visit">Visit profile ↗</span>
+    </a>
+    <div class="reach-banner">
+      <div class="reach-dot"></div>
+      <div class="reach-text"><strong>Top performing reels</strong> — the highest views &amp; reach out of everything edited for this client</div>
+    </div>
+    <div class="grid link-grid three-col">
+      <a class="reel-card img-card" href="https://www.instagram.com/reel/DUyGYfdiL4Y/" target="_blank">
+        <div class="reel-thumb">
+          <div class="corner-tag fire">🔥 High reach</div>
+          <img src="covers/3.jpg" alt="Client reel 01 cover">
+          <div class="thumb-overlay">
+            <div class="play-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+        </div>
+        <div class="reel-info">
+          <div class="reel-title">Reel 01</div>
+          <div class="reel-cta">Watch ↗</div>
+        </div>
+      </a>
+      <a class="reel-card img-card" href="https://www.instagram.com/reel/DYPAcNSILLi/" target="_blank">
+        <div class="reel-thumb">
+          <div class="corner-tag fire">🔥 High reach</div>
+          <img src="covers/4.jpg" alt="Client reel 02 cover">
+          <div class="thumb-overlay">
+            <div class="play-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+        </div>
+        <div class="reel-info">
+          <div class="reel-title">Reel 02</div>
+          <div class="reel-cta">Watch ↗</div>
+        </div>
+      </a>
+      <a class="reel-card img-card" href="https://www.instagram.com/reel/DVTbIZBCN6I/" target="_blank">
+        <div class="reel-thumb">
+          <div class="corner-tag fire">🔥 High reach</div>
+          <img src="covers/5.jpg" alt="Client reel 03 cover">
+          <div class="thumb-overlay">
+            <div class="play-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+          </div>
+        </div>
+        <div class="reel-info">
+          <div class="reel-title">Reel 03</div>
+          <div class="reel-cta">Watch ↗</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="contact">
+    <h2>Have footage that needs a good edit?</h2>
+    <div class="contact-links">
+      <a href="https://www.instagram.com/ashqar.edits/" target="_blank" id="ig-link">instagram.com/ashqar.edits</a>
+      <a href="https://wa.me/962787395799" target="_blank" id="wa-link">wa.me/962787395799</a>
+      <div class="contact-note">DM on Instagram or message on WhatsApp — usually reply within a day.</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
